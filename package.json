@@ -11,9 +11,13 @@
   "dependencies": {
     "@emotion/react": "^11.13.5",
     "@emotion/styled": "^11.13.5",
+    "@mui/icons-material": "^6.1.8",
     "@mui/material": "^6.1.8",
+    "@mui/toolpad-core": "^0.1.51",
     "@mui/x-data-grid": "^7.22.3",
+    "@toolpad/core": "^0.10.0",
     "dotenv": "^16.4.5",
+    "fs": "^0.0.1-security",
     "next": "15.0.3",
     "next-auth": "^4.24.10",
     "pg": "^8.13.1",

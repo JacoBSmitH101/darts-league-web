@@ -1,57 +1,115 @@
 "use client";
 
-import { signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import React from "react";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import { createTheme } from "@mui/material/styles";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import SportsIcon from "@mui/icons-material/Sports";
+import SettingsIcon from "@mui/icons-material/Settings";
+import { AppProvider } from "@toolpad/core/AppProvider";
+import { DashboardLayout } from "@toolpad/core/DashboardLayout";
+import { usePathname, useRouter } from "next/navigation";
 
-export default function HomeLayout({ children }) {
+const NAVIGATION = [
+    {
+        kind: "header",
+        title: "Main Items",
+    },
+    {
+        segment: "home",
+        title: "Home",
+        icon: <DashboardIcon />,
+    },
+    {
+        segment: "home/stats",
+        title: "Stats",
+        icon: <BarChartIcon />,
+    },
+    {
+        segment: "home/players",
+        title: "Players",
+        icon: <SportsIcon />,
+    },
+    {
+        kind: "divider",
+    },
+    {
+        kind: "header",
+        title: "Settings",
+    },
+    {
+        segment: "home/settings",
+        title: "Settings",
+        icon: <SettingsIcon />,
+    },
+];
+
+const demoTheme = createTheme({
+    cssVariables: {
+        colorSchemeSelector: "data-toolpad-color-scheme",
+    },
+    colorSchemes: { light: true, dark: true },
+    breakpoints: {
+        values: {
+            xs: 0,
+            sm: 600,
+            md: 600,
+            lg: 1200,
+            xl: 1536,
+        },
+    },
+});
+
+function DemoPageContent() {
+    const pathname = usePathname(); // Get the current path dynamically
+
+    return (
+        <Box
+            sx={{
+                py: 4,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                textAlign: "center",
+                color: "white",
+            }}
+        >
+            <Typography variant="h4">
+                {pathname === "/home" && "Welcome to the Home Page!"}
+                {pathname === "/home/stats" && "League Stats"}
+                {pathname === "/home/players" && "Manage Players"}
+                {pathname === "/home/settings" && "Settings"}
+            </Typography>
+            <Typography sx={{ mt: 2 }}>
+                {
+                    pathname === "/home"
+                        ? "This is the dashboard home page for managing the darts league."
+                        : `You are on the ${pathname.slice(6)} page.` /* Slice removes "/home/" */
+                }
+            </Typography>
+        </Box>
+    );
+}
+
+export default function DashboardLayoutBasic() {
     const router = useRouter();
 
     return (
-        <div className="h-screen w-screen bg-gradient-to-br from-blue-500 to-cyan-950 flex">
-            {/* Sidebar */}
-            <div className="w-64 h-full bg-black/70 backdrop-blur-lg rounded-lg m-4 shadow-lg">
-                <div className="text-white text-center py-6">
-                    <h2 className="text-xl font-semibold">Sidebar</h2>
-                    <nav className="space-y-4 mt-6">
-                        <a
-                            href="/home"
-                            className="block text-gray-300 hover:text-white transition"
-                        >
-                            Home
-                        </a>
-                        <a
-                            href="/home/stats"
-                            className="block text-gray-300 hover:text-white transition"
-                        >
-                            Stats
-                        </a>
-                    </nav>
-                </div>
-            </div>
-
-            {/* Main Content Area */}
-            <div className="flex-1 flex flex-col m-4 space-y-4">
-                {/* Navbar */}
-                <div className="h-16 bg-black/70 backdrop-blur-lg rounded-lg shadow-lg flex items-center justify-between px-6">
-                    <h1 className="text-white text-lg font-semibold">
-                        Darts League
-                    </h1>
-                    <button
-                        onClick={async () => {
-                            await signOut();
-                            router.push("/login");
-                        }}
-                        className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300"
-                    >
-                        Logout
-                    </button>
-                </div>
-
-                {/* Page-Specific Content */}
-                <div className="flex-1 bg-black/70 backdrop-blur-lg rounded-lg shadow-lg">
-                    {children}
-                </div>
-            </div>
-        </div>
+        <AppProvider navigation={NAVIGATION} theme={demoTheme}>
+            <DashboardLayout
+                navigationProps={{
+                    onNavigationItemClick: (segment) => {
+                        if (!segment.startsWith("/")) {
+                            segment = `/home/${segment}`; // Ensure absolute path
+                        }
+                        router.push(segment);
+                    },
+                }}
+            >
+                <DemoPageContent />
+            </DashboardLayout>
+        </AppProvider>
     );
 }
