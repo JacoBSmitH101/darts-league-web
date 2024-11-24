@@ -9,6 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.5",
+    "@emotion/styled": "^11.13.5",
+    "@mui/material": "^6.1.8",
+    "@mui/x-data-grid": "^7.22.3",
     "dotenv": "^16.4.5",
     "next": "15.0.3",
     "next-auth": "^4.24.10",
