@@ -27,7 +27,7 @@ export default function StandingsPage() {
     }, [session]);
 
     const columns = [
-        { field: "name", headerName: "Player Name", width: 200 },
+        { field: "name", headerName: "Player Name", width: 150 },
         { field: "played", headerName: "Played", width: 100, type: "number" },
         { field: "points", headerName: "Points", width: 100, type: "number" },
         { field: "wins", headerName: "Wins", width: 100, type: "number" },
@@ -37,7 +37,7 @@ export default function StandingsPage() {
 
     return (
         <div className="text-white text-center py-10">
-            <h2 className="text-2xl font-semibold mb-6">Standings Page</h2>
+            <h2 className="text-2xl font-semibold mb-6">League Standings</h2>
 
             {loading ? (
                 <Box
@@ -73,7 +73,7 @@ export default function StandingsPage() {
                                         height: "fit-content",
                                         maxWidth: "100%",
                                     }}
-                                    className="bg-gray-800 p-6 rounded-lg shadow-lg"
+                                    className="bg-zinc-900 p-6 rounded-lg shadow-lg"
                                 >
                                     <h3 className="text-xl font-semibold mb-4">
                                         Division {index + 1}
