@@ -73,6 +73,7 @@ export async function GET(req) {
                 standings.groups[groupId].standings[playerId] = {
                     name: discordTag.substring(0, 15).padEnd(15, " "),
                     discordTag,
+                    userId, // Store user_id
                     played: 0,
                     points: 0,
                     wins: 0,

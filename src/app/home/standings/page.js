@@ -11,6 +11,8 @@ export default function StandingsPage() {
 
     useEffect(() => {
         // Fetch standings from the API
+        //console log discord id from session
+        console.log(session?.user?.id);
         fetch("/api/standings?tournament_id=15397196")
             .then((response) => response.json())
             .then((data) => {
@@ -24,7 +26,7 @@ export default function StandingsPage() {
     }, [session]);
 
     const columns = [
-        { field: "name", headerName: "Player Name", flex: 1 },
+        { field: "name", headerName: "Player Name", width: 200 },
         { field: "played", headerName: "Played", width: 100, type: "number" },
         { field: "points", headerName: "Points", width: 100, type: "number" },
         { field: "wins", headerName: "Wins", width: 100, type: "number" },
@@ -43,15 +45,12 @@ export default function StandingsPage() {
                     {Object.keys(standings)
                         .slice(0, 4) // Limit to 4 groups
                         .map((groupId, index) => {
-                            // Sort group standings by points in descending order
                             const groupStandings = Object.values(
                                 standings[groupId].standings
-                            )
-                                .sort((a, b) => b.points - a.points) // Sort descending by points
-                                .map((player, idx) => ({
-                                    id: `${groupId}-${idx}`, // Unique ID
-                                    ...player,
-                                }));
+                            ).map((player, idx) => ({
+                                id: `${groupId}-${idx}`,
+                                ...player,
+                            }));
 
                             return (
                                 <div
@@ -59,7 +58,7 @@ export default function StandingsPage() {
                                     style={{
                                         minHeight: 600,
                                         height: "fit-content",
-                                        maxWidth: "100%", // Ensure table scales with container
+                                        maxWidth: "100%",
                                     }}
                                     className="bg-gray-800 p-6 rounded-lg shadow-lg"
                                 >
@@ -72,6 +71,12 @@ export default function StandingsPage() {
                                         pageSize={5}
                                         rowsPerPageOptions={[5]}
                                         hideFooter
+                                        getRowClassName={(params) =>
+                                            params.row.userId ===
+                                            session?.user?.id
+                                                ? "bg-blue-200"
+                                                : ""
+                                        }
                                         sx={{
                                             "& .MuiDataGrid-root": {
                                                 color: "white",
@@ -82,6 +87,12 @@ export default function StandingsPage() {
                                             "& .MuiDataGrid-columnHeaders": {
                                                 backgroundColor: "#1e40af",
                                                 borderColor: "#334155",
+                                            },
+                                            "& .MuiDataGrid-row": {
+                                                "&.bg-blue-200": {
+                                                    backgroundColor: "#1d4ed8",
+                                                    color: "white",
+                                                },
                                             },
                                         }}
                                     />
