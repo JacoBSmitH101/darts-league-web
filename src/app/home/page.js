@@ -6,7 +6,8 @@ export default function HomePage() {
             </h2>
             <p>
                 This is your main dashboard. Select options from the sidebar to
-                get started (only users works).
+                get started (only users and standings work) stats will come
+                next.
             </p>
         </div>
     );

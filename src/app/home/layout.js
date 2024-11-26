@@ -15,6 +15,7 @@ import { usePathname, useRouter } from "next/navigation";
 const NAVIGATION = [
     { kind: "header", title: "Main Items" },
     { segment: "home", title: "Home", icon: <DashboardIcon /> },
+    { segment: "home/standings", title: "Standings", icon: <BarChartIcon /> },
     { segment: "home/stats", title: "Stats", icon: <BarChartIcon /> },
     { segment: "home/players", title: "Players", icon: <SportsIcon /> },
     { kind: "divider" },
