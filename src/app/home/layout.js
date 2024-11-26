@@ -11,6 +11,8 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import { AppProvider } from "@toolpad/core/AppProvider";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import { usePathname, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useEffect } from "react";
 
 const NAVIGATION = [
     { kind: "header", title: "Main Items" },
@@ -74,11 +76,15 @@ function DemoPageContent({ children }) {
 
 export default function DashboardLayoutBasic({ children }) {
     const router = useRouter();
+    const { data: session } = useSession();
+
+    console.log(session);
 
     return (
         <AppProvider
             navigation={NAVIGATION}
             theme={demoTheme}
+            session={session}
             branding={{ title: "Unofficial Autodarts League" }}
         >
             <DashboardLayout

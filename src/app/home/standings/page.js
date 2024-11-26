@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { useSession } from "next-auth/react";
+import { CircularProgress, Box, Typography } from "@mui/material";
 
 export default function StandingsPage() {
     const { data: session } = useSession();
@@ -26,7 +27,7 @@ export default function StandingsPage() {
     }, [session]);
 
     const columns = [
-        { field: "name", headerName: "Player Name", width: 200 },
+        { field: "name", headerName: "Player Name", width: 150 },
         { field: "played", headerName: "Played", width: 100, type: "number" },
         { field: "points", headerName: "Points", width: 100, type: "number" },
         { field: "wins", headerName: "Wins", width: 100, type: "number" },
@@ -36,10 +37,22 @@ export default function StandingsPage() {
 
     return (
         <div className="text-white text-center py-10">
-            <h2 className="text-2xl font-semibold mb-6">Standings Page</h2>
+            <h2 className="text-2xl font-semibold mb-6">League Standings</h2>
 
             {loading ? (
-                <p>Loading standings...</p>
+                <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    height="60vh"
+                    flexDirection="column"
+                    color="text.primary"
+                >
+                    <CircularProgress size={60} />
+                    <Typography variant="h6" mt={2}>
+                        Loading Standings...
+                    </Typography>
+                </Box>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-8">
                     {Object.keys(standings)
@@ -60,7 +73,7 @@ export default function StandingsPage() {
                                         height: "fit-content",
                                         maxWidth: "100%",
                                     }}
-                                    className="bg-gray-800 p-6 rounded-lg shadow-lg"
+                                    className="bg-zinc-900 p-6 rounded-lg shadow-lg"
                                 >
                                     <h3 className="text-xl font-semibold mb-4">
                                         Division {index + 1}
