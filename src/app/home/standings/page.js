@@ -71,6 +71,16 @@ export default function StandingsPage() {
                                         pageSize={5}
                                         rowsPerPageOptions={[5]}
                                         hideFooter
+                                        initialState={{
+                                            sorting: {
+                                                sortModel: [
+                                                    {
+                                                        field: "points",
+                                                        sort: "desc",
+                                                    },
+                                                ], // Sort by points in descending order
+                                            },
+                                        }}
                                         getRowClassName={(params) =>
                                             params.row.userId ===
                                             session?.user?.id
