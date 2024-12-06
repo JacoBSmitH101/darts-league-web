@@ -25,89 +25,90 @@ export async function GET(req) {
         );
     }
 
-    // Fetch tournament URL
-    const { rows: tournamentData } = await query(
-        "SELECT challonge_id FROM tournaments WHERE tournament_id = $1",
-        [tournamentId]
+    // Preload player IDs from matches
+    const playerIds = [
+        ...new Set(
+            matches.flatMap((match) => [match.player1_id, match.player2_id])
+        ),
+    ];
+
+    // Preload player names from challonge_id
+    const playerNames = {};
+    const { rows: playerData } = await query(
+        "SELECT challonge_id, discord_tag FROM participants p JOIN users u ON p.user_id = u.user_id WHERE challonge_id = ANY($1::int[])",
+        [playerIds]
     );
-    const tournamentUrl = tournamentData?.[0]?.challonge_url || "";
+    for (const { challonge_id, discord_tag } of playerData) {
+        playerNames[challonge_id] = discord_tag || `Player ${challonge_id}`;
+    }
 
-    // Initialize standings structure
-    const standings = {
-        tournamentId,
-        groups: {},
-        tournamentUrl,
-    };
+    // Organize matches by group
+    const matchesByGroup = matches.reduce((acc, match) => {
+        if (!match.group_id) return acc;
+        acc[match.group_id] = acc[match.group_id] || [];
+        acc[match.group_id].push(match);
+        return acc;
+    }, {});
 
-    // Process matches and populate standings
-    for (const match of matches) {
-        const groupId = match.group_id;
-        if (!groupId) continue;
+    // Initialize standings
+    const standings = { tournamentId, groups: {} };
 
-        // Initialize group if not present
-        if (!standings.groups[groupId]) {
-            standings.groups[groupId] = { standings: {} };
-        }
+    for (const [groupId, groupMatches] of Object.entries(matchesByGroup)) {
+        standings.groups[groupId] = standings.groups[groupId] || {
+            standings: {},
+        };
 
-        // Initialize players if not already present
-        const playerIds = [match.player1_id, match.player2_id];
-        for (const playerId of playerIds) {
-            if (!standings.groups[groupId].standings[playerId]) {
-                // Fetch the user_id from the participants table using challonge_id
-                const { rows: participantData } = await query(
-                    "SELECT user_id FROM participants WHERE challonge_id = $1",
-                    [playerId]
-                );
+        for (const match of groupMatches) {
+            const {
+                player1_id,
+                player2_id,
+                winner_id,
+                player1_score,
+                player2_score,
+                state,
+            } = match;
+            const players = [player1_id, player2_id];
 
-                const userId = participantData?.[0]?.user_id;
+            players.forEach((playerId) => {
+                if (!standings.groups[groupId].standings[playerId]) {
+                    const playerName = playerNames[playerId];
+                    standings.groups[groupId].standings[playerId] = {
+                        rank: 0,
+                        name: playerName.substring(0, 15).padEnd(15, " "),
+                        wins: 0,
+                        losses: 0,
+                        draws: 0,
+                        points: 0,
+                        played: 0,
+                    };
+                }
+            });
 
-                // Fetch discord_tag from the users table using user_id
-                const { rows: userData } = await query(
-                    "SELECT discord_tag FROM users WHERE user_id = $1",
-                    [userId]
-                );
+            // Update standings
+            standings.groups[groupId].standings[player1_id].points +=
+                player1_score;
+            standings.groups[groupId].standings[player2_id].points +=
+                player2_score;
 
-                const discordTag =
-                    userData?.[0]?.discord_tag || `Player ${playerId}`;
-
-                standings.groups[groupId].standings[playerId] = {
-                    name: discordTag.substring(0, 15).padEnd(15, " "),
-                    discordTag,
-                    userId, // Store user_id
-                    played: 0,
-                    points: 0,
-                    wins: 0,
-                    losses: 0,
-                    draws: 0,
-                };
-            }
-        }
-
-        const [player1, player2] = playerIds;
-
-        // Update scores and results
-        standings.groups[groupId].standings[player1].points +=
-            match.player1_score;
-        standings.groups[groupId].standings[player2].points +=
-            match.player2_score;
-
-        if (match.state === "complete") {
-            standings.groups[groupId].standings[player1].played++;
-            standings.groups[groupId].standings[player2].played++;
-
-            if (match.winner_id === "draw") {
-                standings.groups[groupId].standings[player1].draws++;
-                standings.groups[groupId].standings[player2].draws++;
-                standings.groups[groupId].standings[player1].points++;
-                standings.groups[groupId].standings[player2].points++;
-            } else if (match.winner_id === player1) {
-                standings.groups[groupId].standings[player1].wins++;
-                standings.groups[groupId].standings[player1].points += 2;
-                standings.groups[groupId].standings[player2].losses++;
-            } else if (match.winner_id === player2) {
-                standings.groups[groupId].standings[player2].wins++;
-                standings.groups[groupId].standings[player2].points += 2;
-                standings.groups[groupId].standings[player1].losses++;
+            if (state === "complete") {
+                if (!winner_id) {
+                    standings.groups[groupId].standings[player1_id].draws++;
+                    standings.groups[groupId].standings[player2_id].draws++;
+                    standings.groups[groupId].standings[player1_id].points++;
+                    standings.groups[groupId].standings[player2_id].points++;
+                } else {
+                    const winner =
+                        standings.groups[groupId].standings[winner_id];
+                    const loser =
+                        standings.groups[groupId].standings[
+                            player1_id === winner_id ? player2_id : player1_id
+                        ];
+                    winner.wins++;
+                    loser.losses++;
+                    winner.points += 2;
+                }
+                standings.groups[groupId].standings[player1_id].played++;
+                standings.groups[groupId].standings[player2_id].played++;
             }
         }
     }

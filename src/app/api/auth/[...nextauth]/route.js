@@ -14,6 +14,7 @@ export const authOptions = {
             return session;
         },
     },
+    debug: true,
 };
 
 const handler = NextAuth(authOptions);

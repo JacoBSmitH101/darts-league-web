@@ -7,6 +7,9 @@ export default function StatsPage() {
     const [stats, setStats] = useState([]);
     const [error, setError] = useState(null);
 
+    // Replace this with the actual logged-in Discord ID (e.g., fetched from session or context)
+    const loggedInDiscordId = "414395899570290690";
+
     // Fetch stats from the API
     const getStats = async () => {
         try {
@@ -52,6 +55,11 @@ export default function StatsPage() {
                     columns={columns}
                     pageSize={5}
                     rowsPerPageOptions={[5, 10, 20]}
+                    getRowClassName={(params) =>
+                        params.row.user_id === loggedInDiscordId
+                            ? "highlighted-row"
+                            : ""
+                    }
                     sx={{
                         backgroundColor: "rgba(0, 0, 0, 0.8)",
                         color: "white",
@@ -64,6 +72,10 @@ export default function StatsPage() {
                         },
                         "& .MuiDataGrid-footerContainer": {
                             backgroundColor: "#1f2937",
+                        },
+                        "& .MuiDataGrid-row.highlighted-row": {
+                            backgroundColor: "#4B5563", // Dark gray for highlighting
+                            color: "white",
                         },
                     }}
                 />
