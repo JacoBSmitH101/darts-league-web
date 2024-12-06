@@ -3,12 +3,13 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Tooltip } from "@mui/material";
+import { Tooltip, CircularProgress } from "@mui/material";
 import { Info as InfoIcon } from "@mui/icons-material";
 
 export default function MatchesPage() {
     const [matches, setMatches] = useState([]);
     const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true); // Added loading state
     const { data: session } = useSession();
     const router = useRouter();
 
@@ -21,6 +22,8 @@ export default function MatchesPage() {
             setMatches(data);
         } catch (error) {
             setError(error.message);
+        } finally {
+            setLoading(false); // Stop loading once the data fetch completes
         }
     };
 
@@ -47,82 +50,81 @@ export default function MatchesPage() {
                 See all your matches in the current league.
             </p>
 
-            {error && (
+            {/* Show loading spinner */}
+            {loading && (
+                <div className="flex justify-center items-center h-48">
+                    <CircularProgress style={{ color: "white" }} />
+                </div>
+            )}
+
+            {/* Show error message */}
+            {error && !loading && (
                 <p className="text-red-500 mt-4">
                     Failed to load matches: {error}
                 </p>
             )}
 
-            <div className="grid grid-cols-1 mt-10 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {matches.map((match) => {
-                    const opponent =
-                        match.player1_name === session?.user?.name
-                            ? match.player2_name
-                            : match.player1_name;
-                    const score =
-                        match.player1_name === session?.user?.name
-                            ? `${match.player1_score} - ${match.player2_score}`
-                            : `${match.player2_score} - ${match.player1_score}`;
-                    const statusColor = getStatusColor(match);
+            {/* Show matches */}
+            {!loading && !error && (
+                <div className="grid grid-cols-1 mt-10 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {matches.map((match) => {
+                        const opponent =
+                            match.player1_name === session?.user?.name
+                                ? match.player2_name
+                                : match.player1_name;
+                        const score =
+                            match.player1_name === session?.user?.name
+                                ? `${match.player1_score} - ${match.player2_score}`
+                                : `${match.player2_score} - ${match.player1_score}`;
+                        const statusColor = getStatusColor(match);
 
-                    return (
-                        <div
-                            key={match.match_id}
-                            className="relative bg-zinc-900 rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105 cursor-pointer"
-                            onClick={() =>
-                                router.push(
-                                    `/home/matches/match/${match.match_id}`
-                                )
-                            }
-                            style={{ height: "150px" }} // Consistent card height
-                        >
-                            {/* Status Bar */}
+                        return (
                             <div
-                                className={`absolute top-0 left-0 w-full h-2 ${statusColor}`}
-                            ></div>
+                                key={match.match_id}
+                                className="relative bg-zinc-900 rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105 cursor-pointer"
+                                onClick={() =>
+                                    router.push(
+                                        `/home/matches/match/${match.match_id}`
+                                    )
+                                }
+                                style={{ height: "150px" }} // Consistent card height
+                            >
+                                {/* Status Bar */}
+                                <div
+                                    className={`absolute top-0 left-0 w-full h-2 ${statusColor}`}
+                                ></div>
 
-                            {/* Main Content */}
-                            <div className="p-4 flex flex-col h-full mt-1">
-                                <div className="flex flex-col gap-1">
-                                    <h3 className="text-lg font-semibold truncate">
-                                        Opponent: {opponent}
-                                    </h3>
-                                    <p className="text-sm text-gray-400">
-                                        Updated:{" "}
-                                        {new Date(
-                                            match.updated_at
-                                        ).toLocaleDateString()}
-                                    </p>
-                                    {match.state === "complete" && (
-                                        <p className="text-lg font-semibold text-gray-300">
-                                            Score: {score}
+                                {/* Main Content */}
+                                <div className="p-4 flex flex-col h-full mt-1">
+                                    <div className="flex flex-col gap-1">
+                                        <h3 className="text-lg font-semibold truncate">
+                                            Opponent: {opponent}
+                                        </h3>
+                                        <p className="text-sm text-gray-400">
+                                            Updated:{" "}
+                                            {new Date(
+                                                match.updated_at
+                                            ).toLocaleDateString()}
                                         </p>
-                                    )}
-                                </div>
+                                        {match.state === "complete" && (
+                                            <p className="text-lg font-semibold text-gray-300">
+                                                Score: {score}
+                                            </p>
+                                        )}
+                                    </div>
 
-                                {/* Bottom Info */}
-                                {/* <div className="flex justify-between items-center mt-2">
-                                    <Tooltip
-                                        title={`Match ID: ${match.match_id}, Group ID: ${match.group_id}`}
-                                        placement="top"
-                                        arrow
-                                    >
-                                        <InfoIcon className="text-gray-400 hover:text-white cursor-pointer inline-block align-middle ml-2" />
-                                    </Tooltip>
-                                    <p className="text-sm text-center">
-                                        Click to view match details
-                                    </p>
-                                </div> */}
-                                <div className="flex justify-center items-center mt-2">
-                                    <p className="text-xs text-gray-400 text-center">
-                                        Click to view match details
-                                    </p>
+                                    {/* Bottom Info */}
+                                    <div className="flex justify-center items-center mt-2">
+                                        <p className="text-xs text-gray-400 text-center">
+                                            Click to view match details
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    );
-                })}
-            </div>
+                        );
+                    })}
+                </div>
+            )}
         </div>
     );
 }
