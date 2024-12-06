@@ -23,7 +23,7 @@ export default function StatsPage() {
     return (
         <div className="text-white text-center py-10">
             <h2 className="text-2xl font-semibold">Stats Page</h2>
-            <p>View detailed stats about the darts league here.</p>
+            <p>View detailed stats about the darts league here. hopefully</p>
             <div className="mt-8">
                 <h3 className="text-xl font-semibold">Stats</h3>
                 <div className="grid grid-cols-3 gap-4 mt-4">

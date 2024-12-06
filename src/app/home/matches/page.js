@@ -1,0 +1,128 @@
+"use client";
+
+import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Tooltip } from "@mui/material";
+import { Info as InfoIcon } from "@mui/icons-material";
+
+export default function MatchesPage() {
+    const [matches, setMatches] = useState([]);
+    const [error, setError] = useState(null);
+    const { data: session } = useSession();
+    const router = useRouter();
+
+    const getStats = async () => {
+        try {
+            const res = await fetch(
+                `/api/matches?user_id=${session?.user?.id}&tournament_id=15397196`
+            );
+            const data = await res.json();
+            setMatches(data);
+        } catch (error) {
+            setError(error.message);
+        }
+    };
+
+    const userId = session?.user?.id;
+    useEffect(() => {
+        if (userId) {
+            getStats();
+        }
+    }, [userId]);
+
+    const getStatusColor = (match) => {
+        if (match.state === "complete") {
+            if (match.winner_id === null) return "bg-yellow-500"; // Draw
+            if (match.winner_id === match.player1_id) return "bg-green-500"; // Won
+            return "bg-red-500"; // Lost
+        }
+        return "bg-gray-500"; // Not Played
+    };
+
+    return (
+        <div className="text-white text-center py-10 px-4 max-w-7xl mx-auto">
+            <h2 className="text-3xl font-semibold mb-6">Your Matches</h2>
+            <p className="mb-6 text-gray-300">
+                See all your matches in the current league.
+            </p>
+
+            {error && (
+                <p className="text-red-500 mt-4">
+                    Failed to load matches: {error}
+                </p>
+            )}
+
+            <div className="grid grid-cols-1 mt-10 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {matches.map((match) => {
+                    const opponent =
+                        match.player1_name === session?.user?.name
+                            ? match.player2_name
+                            : match.player1_name;
+                    const score =
+                        match.player1_name === session?.user?.name
+                            ? `${match.player1_score} - ${match.player2_score}`
+                            : `${match.player2_score} - ${match.player1_score}`;
+                    const statusColor = getStatusColor(match);
+
+                    return (
+                        <div
+                            key={match.match_id}
+                            className="relative bg-zinc-900 rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105 cursor-pointer"
+                            onClick={() =>
+                                router.push(
+                                    `/home/matches/match/${match.match_id}`
+                                )
+                            }
+                            style={{ height: "150px" }} // Consistent card height
+                        >
+                            {/* Status Bar */}
+                            <div
+                                className={`absolute top-0 left-0 w-full h-2 ${statusColor}`}
+                            ></div>
+
+                            {/* Main Content */}
+                            <div className="p-4 flex flex-col h-full mt-1">
+                                <div className="flex flex-col gap-1">
+                                    <h3 className="text-lg font-semibold truncate">
+                                        Opponent: {opponent}
+                                    </h3>
+                                    <p className="text-sm text-gray-400">
+                                        Updated:{" "}
+                                        {new Date(
+                                            match.updated_at
+                                        ).toLocaleDateString()}
+                                    </p>
+                                    {match.state === "complete" && (
+                                        <p className="text-lg font-semibold text-gray-300">
+                                            Score: {score}
+                                        </p>
+                                    )}
+                                </div>
+
+                                {/* Bottom Info */}
+                                {/* <div className="flex justify-between items-center mt-2">
+                                    <Tooltip
+                                        title={`Match ID: ${match.match_id}, Group ID: ${match.group_id}`}
+                                        placement="top"
+                                        arrow
+                                    >
+                                        <InfoIcon className="text-gray-400 hover:text-white cursor-pointer inline-block align-middle ml-2" />
+                                    </Tooltip>
+                                    <p className="text-sm text-center">
+                                        Click to view match details
+                                    </p>
+                                </div> */}
+                                <div className="flex justify-center items-center mt-2">
+                                    <p className="text-xs text-gray-400 text-center">
+                                        Click to view match details
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}

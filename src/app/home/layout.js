@@ -19,7 +19,7 @@ const NAVIGATION = [
     { segment: "home", title: "Home", icon: <DashboardIcon /> },
     { segment: "home/standings", title: "Standings", icon: <BarChartIcon /> },
     { segment: "home/stats", title: "Stats", icon: <BarChartIcon /> },
-    { segment: "home/players", title: "Players", icon: <SportsIcon /> },
+    { segment: "home/matches", title: "Matches", icon: <SportsIcon /> },
     { kind: "divider" },
     { kind: "header", title: "Admin" },
     { segment: "home/users", title: "Users", icon: <SettingsIcon /> },
