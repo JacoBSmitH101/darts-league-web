@@ -53,10 +53,18 @@ export default function MatchPage() {
     const ad_stats = matchData?.stats_data || {};
     const { host = {}, games = [], players = [], matchStats = [] } = ad_stats;
 
-    // Helper to render each player's scoreboard column
-    const renderPlayerSide = (player, stats) => {
+    const getLegsColor = (legs) => {
+        if (legs > 3) return "text-green-400";
+        if (legs === 3) return "text-yellow-400";
+        return "text-red-400";
+    };
+
+    const ScoreBlock = ({ player, stats }) => {
+        const legs = stats.legsWon ?? 0;
+        const legsColor = getLegsColor(legs);
+
         return (
-            <div className="flex flex-col items-center space-y-4">
+            <div className="flex flex-col items-center space-y-2">
                 {player.avatarUrl && (
                     <img
                         src={player.avatarUrl}
@@ -64,14 +72,45 @@ export default function MatchPage() {
                         className="w-24 h-24 rounded-full mb-2"
                     />
                 )}
-                <h2 className="text-2xl font-bold">
+                <h2 className="text-xl font-bold">
                     {player.name || "Unknown Player"}
                 </h2>
-                <div className="text-7xl font-extrabold text-green-400">
-                    {stats.legsWon ?? "0"}
+                <div className={`text-7xl font-extrabold ${legsColor}`}>
+                    {legs}
                 </div>
-                <div className="text-gray-300 uppercase text-sm tracking-wide">
-                    Legs Won
+            </div>
+        );
+    };
+
+    const StatsBlock = ({ stats }) => {
+        return (
+            <div className="w-80 space-y-2 bg-zinc-700 p-6 rounded-lg shadow-md">
+                <h3 className="text-xl font-semibold mb-4 underline decoration-green-400 text-center">
+                    Stats
+                </h3>
+                <div className="flex justify-between text-gray-200">
+                    <span className="font-bold">Average</span>
+                    <span>{stats.average?.toFixed(2) || "N/A"}</span>
+                </div>
+                <div className="flex justify-between text-gray-200">
+                    <span className="font-bold">Checkouts Hit</span>
+                    <span>{stats.checkoutsHit ?? "N/A"}</span>
+                </div>
+                <div className="flex justify-between text-gray-200">
+                    <span className="font-bold">Checkout %</span>
+                    <span>
+                        {stats.checkoutPercent
+                            ? (stats.checkoutPercent * 100).toFixed(1) + "%"
+                            : "N/A"}
+                    </span>
+                </div>
+                <div className="flex justify-between text-gray-200">
+                    <span className="font-bold">Darts Thrown</span>
+                    <span>{stats.dartsThrown ?? "N/A"}</span>
+                </div>
+                <div className="flex justify-between text-gray-200">
+                    <span className="font-bold">First 9 Avg</span>
+                    <span>{stats.first9Average?.toFixed(2) || "N/A"}</span>
                 </div>
             </div>
         );
@@ -90,84 +129,39 @@ export default function MatchPage() {
 
             {players.length > 0 && matchStats.length === players.length ? (
                 <>
-                    {/* Huge max width box with a dark shade background for the scoreboard */}
+                    {/* Layout: player1score - stats | stats - player2score */}
                     <div className="w-full bg-zinc-800 rounded-xl py-12">
-                        <div className="max-w-7xl mx-auto px-4 flex items-center justify-evenly space-x-10">
-                            {players.map((player, index) => {
-                                const stats = matchStats[index];
-                                return (
-                                    <div
-                                        key={player.id}
-                                        className="flex-1 flex justify-center"
-                                    >
-                                        {renderPlayerSide(player, stats)}
+                        <div className="max-w-7xl mx-auto px-4 flex items-start justify-evenly space-x-10">
+                            {players.length === 2 ? (
+                                <>
+                                    {/* Player 1 side */}
+                                    <div className="flex-1 flex justify-between items-start">
+                                        <ScoreBlock
+                                            player={players[0]}
+                                            stats={matchStats[0]}
+                                        />
+                                        <StatsBlock stats={matchStats[0]} />
                                     </div>
-                                );
-                            })}
-                        </div>
-                    </div>
 
-                    {/* Stats Section below the big scoreboard */}
-                    <div className="grid grid-cols-2 gap-12 mt-8">
-                        {players.map((player, index) => {
-                            const stats = matchStats[index];
-                            return (
-                                <div
-                                    key={player.id}
-                                    className="space-y-2 bg-zinc-800 p-6 rounded-lg shadow-md"
-                                >
-                                    <h3 className="text-xl font-semibold mb-4 underline decoration-green-400">
-                                        {player.name || "Unknown Player"} Stats
-                                    </h3>
-                                    <div className="flex justify-between text-gray-200">
-                                        <span className="font-bold">
-                                            Average
-                                        </span>
-                                        <span>
-                                            {stats.average?.toFixed(2) || "N/A"}
-                                        </span>
+                                    {/* Divider */}
+                                    <div className="w-16 bg-gray-600 h-full mx-6" />
+
+                                    {/* Player 2 side */}
+                                    <div className="flex-1 flex justify-between items-start">
+                                        <StatsBlock stats={matchStats[1]} />
+                                        <ScoreBlock
+                                            player={players[1]}
+                                            stats={matchStats[1]}
+                                        />
                                     </div>
-                                    <div className="flex justify-between text-gray-200">
-                                        <span className="font-bold">
-                                            Checkouts Hit
-                                        </span>
-                                        <span>
-                                            {stats.checkoutsHit ?? "N/A"}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between text-gray-200">
-                                        <span className="font-bold">
-                                            Checkout %
-                                        </span>
-                                        <span>
-                                            {stats.checkoutPercent
-                                                ? (
-                                                      stats.checkoutPercent *
-                                                      100
-                                                  ).toFixed(1) + "%"
-                                                : "N/A"}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between text-gray-200">
-                                        <span className="font-bold">
-                                            Darts Thrown
-                                        </span>
-                                        <span>
-                                            {stats.dartsThrown ?? "N/A"}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between text-gray-200">
-                                        <span className="font-bold">
-                                            First 9 Avg
-                                        </span>
-                                        <span>
-                                            {stats.first9Average?.toFixed(2) ||
-                                                "N/A"}
-                                        </span>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                                </>
+                            ) : (
+                                <p className="text-gray-400 text-center">
+                                    Currently only supporting two players
+                                    layout.
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </>
             ) : (
