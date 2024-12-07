@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { createTheme } from "@mui/material/styles";
@@ -12,18 +12,37 @@ import { AppProvider } from "@toolpad/core/AppProvider";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useEffect } from "react";
 
-const NAVIGATION = [
-    { kind: "header", title: "Main Items" },
-    { segment: "home", title: "Home", icon: <DashboardIcon /> },
-    { segment: "home/standings", title: "Standings", icon: <BarChartIcon /> },
-    { segment: "home/stats", title: "Stats", icon: <BarChartIcon /> },
-    { segment: "home/matches", title: "Matches", icon: <SportsIcon /> },
-    { kind: "divider" },
-    { kind: "header", title: "Admin" },
-    { segment: "home/users", title: "Users", icon: <SettingsIcon /> },
-];
+const allowedAdminDiscordIds = ["414395899570290690", "335970728811954187"]; // Replace with actual allowed Discord IDs
+
+function getNavigation(session) {
+    const baseNavigation = [
+        { kind: "header", title: "Main Items" },
+        { segment: "home", title: "Home", icon: <DashboardIcon /> },
+        {
+            segment: "home/standings",
+            title: "Standings",
+            icon: <BarChartIcon />,
+        },
+        { segment: "home/stats", title: "Stats", icon: <BarChartIcon /> },
+        { segment: "home/matches", title: "Matches", icon: <SportsIcon /> },
+    ];
+
+    const isAdmin =
+        session?.user?.id && allowedAdminDiscordIds.includes(session?.user?.id);
+
+    if (isAdmin) {
+        baseNavigation.push({ kind: "divider" });
+        baseNavigation.push({ kind: "header", title: "Admin" });
+        baseNavigation.push({
+            segment: "home/users",
+            title: "Users",
+            icon: <SettingsIcon />,
+        });
+    }
+
+    return baseNavigation;
+}
 
 const demoTheme = createTheme({
     cssVariables: {
@@ -77,12 +96,15 @@ function DemoPageContent({ children }) {
 export default function DashboardLayoutBasic({ children }) {
     const router = useRouter();
     const { data: session } = useSession();
+    const [navigation, setNavigation] = useState(getNavigation(session));
 
-    console.log(session);
+    useEffect(() => {
+        setNavigation(getNavigation(session));
+    }, [session, router]);
 
     return (
         <AppProvider
-            navigation={NAVIGATION}
+            navigation={navigation}
             theme={demoTheme}
             session={session}
             branding={{ title: "Unofficial Autodarts League" }}

@@ -12,46 +12,45 @@ export async function GET(req) {
         );
     }
 
+    // Define mobileView if needed, or just remove these checks.
+    // For now, let's assume mobileView = false
+    const mobileView = false;
+
+    const standings = { tournamentId, groups: {} };
+
     // Fetch matches from the database
-    const { rows: matches } = await query(
+    const matches = await query(
         "SELECT * FROM matches WHERE tournament_id = $1",
         [tournamentId]
     );
 
-    if (!matches || matches.length === 0) {
-        return NextResponse.json(
-            { error: "No matches found for this tournament" },
-            { status: 404 }
-        );
-    }
-
-    // Preload player IDs from matches
     const playerIds = [
         ...new Set(
-            matches.flatMap((match) => [match.player1_id, match.player2_id])
+            matches.rows.flatMap((match) => [
+                match.player1_id,
+                match.player2_id,
+            ])
         ),
     ];
 
-    // Preload player names from challonge_id
-    const playerNames = {};
-    const { rows: playerData } = await query(
-        "SELECT challonge_id, discord_tag FROM participants p JOIN users u ON p.user_id = u.user_id WHERE challonge_id = ANY($1::int[])",
-        [playerIds]
-    );
-    for (const { challonge_id, discord_tag } of playerData) {
-        playerNames[challonge_id] = discord_tag || `Player ${challonge_id}`;
-    }
+    const pquery = `
+        SELECT p.challonge_id, u.discord_tag
+        FROM Participants p
+        INNER JOIN Users u ON p.user_id = u.user_id
+        WHERE p.challonge_id = ANY($1::integer[])
+    `;
 
-    // Organize matches by group
-    const matchesByGroup = matches.reduce((acc, match) => {
+    let participants = await query(pquery, [playerIds]);
+    const players = Object.fromEntries(
+        participants.rows.map((p) => [p.challonge_id, p.discord_tag])
+    );
+
+    const matchesByGroup = matches.rows.reduce((acc, match) => {
         if (!match.group_id) return acc;
         acc[match.group_id] = acc[match.group_id] || [];
         acc[match.group_id].push(match);
         return acc;
     }, {});
-
-    // Initialize standings
-    const standings = { tournamentId, groups: {} };
 
     for (const [groupId, groupMatches] of Object.entries(matchesByGroup)) {
         standings.groups[groupId] = standings.groups[groupId] || {
@@ -67,31 +66,43 @@ export async function GET(req) {
                 player2_score,
                 state,
             } = match;
-            const players = [player1_id, player2_id];
+            const thesePlayers = [player1_id, player2_id];
 
-            players.forEach((playerId) => {
+            thesePlayers.forEach((playerId) => {
                 if (!standings.groups[groupId].standings[playerId]) {
-                    const playerName = playerNames[playerId];
-                    standings.groups[groupId].standings[playerId] = {
-                        rank: 0,
-                        name: playerName.substring(0, 15).padEnd(15, " "),
-                        wins: 0,
-                        losses: 0,
-                        draws: 0,
-                        points: 0,
-                        played: 0,
-                    };
+                    const playerName = players[playerId] || "Unknown";
+                    if (mobileView) {
+                        standings.groups[groupId].standings[playerId] = {
+                            name: playerName.substring(0, 7).padEnd(7, " "),
+                            points: 0,
+                            played: 0,
+                        };
+                    } else {
+                        standings.groups[groupId].standings[playerId] = {
+                            rank: 0,
+                            name: playerName.substring(0, 15).padEnd(15, " "),
+                            wins: 0,
+                            losses: 0,
+                            draws: 0,
+                            points: 0,
+                            played: 0,
+                        };
+                    }
                 }
             });
 
-            // Update standings
+            // Update points from scores
             standings.groups[groupId].standings[player1_id].points +=
                 player1_score;
             standings.groups[groupId].standings[player2_id].points +=
                 player2_score;
 
             if (state === "complete") {
-                if (!winner_id) {
+                standings.groups[groupId].standings[player1_id].played++;
+                standings.groups[groupId].standings[player2_id].played++;
+
+                if (winner_id === null) {
+                    // It's a draw
                     standings.groups[groupId].standings[player1_id].draws++;
                     standings.groups[groupId].standings[player2_id].draws++;
                     standings.groups[groupId].standings[player1_id].points++;
@@ -107,11 +118,11 @@ export async function GET(req) {
                     loser.losses++;
                     winner.points += 2;
                 }
-                standings.groups[groupId].standings[player1_id].played++;
-                standings.groups[groupId].standings[player2_id].played++;
             }
         }
     }
+
+    console.log(standings);
 
     // Return computed standings
     return NextResponse.json(standings);

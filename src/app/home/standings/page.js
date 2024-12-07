@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { useSession } from "next-auth/react";
-import { CircularProgress, Box, Typography } from "@mui/material";
+import { CircularProgress, Box, Typography, Paper } from "@mui/material";
 
 export default function StandingsPage() {
     const { data: session } = useSession();
@@ -11,9 +11,7 @@ export default function StandingsPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Fetch standings from the API
-        //console log discord id from session
-        console.log(session?.user?.id);
+        console.log("User Name:", session?.user?.name);
         fetch("/api/standings?tournament_id=15397196")
             .then((response) => response.json())
             .then((data) => {
@@ -27,17 +25,76 @@ export default function StandingsPage() {
     }, [session]);
 
     const columns = [
-        { field: "name", headerName: "Player Name", width: 150 },
-        { field: "played", headerName: "Played", width: 100, type: "number" },
-        { field: "points", headerName: "Points", width: 100, type: "number" },
-        { field: "wins", headerName: "Wins", width: 100, type: "number" },
-        { field: "losses", headerName: "Losses", width: 100, type: "number" },
-        { field: "draws", headerName: "Draws", width: 100, type: "number" },
+        {
+            field: "name",
+            headerName: "Player Name",
+            width: 180,
+            headerAlign: "center",
+            align: "center",
+        },
+        {
+            field: "played",
+            headerName: "Played",
+            width: 110,
+            type: "number",
+            headerAlign: "center",
+            align: "center",
+        },
+        {
+            field: "points",
+            headerName: "Points",
+            width: 110,
+            type: "number",
+            headerAlign: "center",
+            align: "center",
+        },
+        {
+            field: "wins",
+            headerName: "Wins",
+            width: 110,
+            type: "number",
+            headerAlign: "center",
+            align: "center",
+        },
+        {
+            field: "losses",
+            headerName: "Losses",
+            width: 110,
+            type: "number",
+            headerAlign: "center",
+            align: "center",
+        },
+        {
+            field: "draws",
+            headerName: "Draws",
+            width: 110,
+            type: "number",
+            headerAlign: "center",
+            align: "center",
+        },
     ];
 
     return (
-        <div className="text-white text-center py-10">
-            <h2 className="text-2xl font-semibold mb-6">League Standings</h2>
+        <div
+            className="text-white py-10"
+            style={{
+                background:
+                    "linear-gradient(to bottom right, #000000, #0f0f0f)",
+                minHeight: "100vh",
+            }}
+        >
+            <Box textAlign="center" mb={6}>
+                <Typography
+                    variant="h3"
+                    component="h2"
+                    sx={{ fontWeight: "bold", mb: 1 }}
+                >
+                    League Standings
+                </Typography>
+                <Typography variant="subtitle1" sx={{ color: "#d1d5db" }}>
+                    Check out how players are performing in each division
+                </Typography>
+            </Box>
 
             {loading ? (
                 <Box
@@ -56,7 +113,7 @@ export default function StandingsPage() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-8">
                     {Object.keys(standings)
-                        .slice(0, 4) // Limit to 4 groups
+                        .slice(0, 4)
                         .map((groupId, index) => {
                             const groupStandings = Object.values(
                                 standings[groupId].standings
@@ -66,60 +123,77 @@ export default function StandingsPage() {
                             }));
 
                             return (
-                                <div
+                                <Paper
                                     key={groupId}
-                                    style={{
-                                        minHeight: 600,
-                                        height: "fit-content",
-                                        maxWidth: "100%",
+                                    sx={{
+                                        p: 3,
+                                        borderRadius: 2,
+                                        backgroundColor: "rgba(17,17,17,0.8)",
+                                        backdropFilter: "blur(4px)",
+                                        boxShadow: "0 4px 14px rgba(0,0,0,0.7)",
                                     }}
-                                    className="bg-zinc-900 p-6 rounded-lg shadow-lg"
                                 >
-                                    <h3 className="text-xl font-semibold mb-4">
-                                        Division {index + 1}
-                                    </h3>
-                                    <DataGrid
-                                        rows={groupStandings}
-                                        columns={columns}
-                                        pageSize={5}
-                                        rowsPerPageOptions={[5]}
-                                        hideFooter
-                                        initialState={{
-                                            sorting: {
-                                                sortModel: [
-                                                    {
-                                                        field: "points",
-                                                        sort: "desc",
-                                                    },
-                                                ], // Sort by points in descending order
-                                            },
-                                        }}
-                                        getRowClassName={(params) =>
-                                            params.row.userId ===
-                                            session?.user?.id
-                                                ? "bg-blue-200"
-                                                : ""
-                                        }
+                                    <Typography
+                                        variant="h5"
+                                        component="h3"
                                         sx={{
-                                            "& .MuiDataGrid-root": {
+                                            fontWeight: "bold",
+                                            mb: 2,
+                                            textAlign: "center",
+                                        }}
+                                    >
+                                        Division {index + 1}
+                                    </Typography>
+                                    <div style={{ height: 520, width: "100%" }}>
+                                        <DataGrid
+                                            rows={groupStandings}
+                                            columns={columns}
+                                            pageSize={5}
+                                            rowsPerPageOptions={[5]}
+                                            hideFooter
+                                            initialState={{
+                                                sorting: {
+                                                    sortModel: [
+                                                        {
+                                                            field: "points",
+                                                            sort: "desc",
+                                                        },
+                                                    ],
+                                                },
+                                            }}
+                                            getRowClassName={(params) =>
+                                                params.row.name?.trim() ===
+                                                session?.user?.name?.trim()
+                                                    ? "current-user-row"
+                                                    : ""
+                                            }
+                                            sx={{
                                                 color: "white",
-                                            },
-                                            "& .MuiDataGrid-cell": {
-                                                borderColor: "#334155",
-                                            },
-                                            "& .MuiDataGrid-columnHeaders": {
-                                                backgroundColor: "#1e40af",
-                                                borderColor: "#334155",
-                                            },
-                                            "& .MuiDataGrid-row": {
-                                                "&.bg-blue-200": {
-                                                    backgroundColor: "#1d4ed8",
+                                                border: "none",
+                                                "& .MuiDataGrid-columnHeaders":
+                                                    {
+                                                        backgroundColor:
+                                                            "#1f2937",
+                                                        borderColor: "#374151",
+                                                        fontWeight: "bold",
+                                                        color: "#e5e7eb",
+                                                    },
+                                                "& .MuiDataGrid-cell": {
+                                                    borderColor: "#374151",
+                                                },
+                                                "& .MuiDataGrid-row:hover": {
+                                                    backgroundColor: "#262626",
+                                                },
+                                                "& .current-user-row": {
+                                                    fontWeight: "bold",
+                                                    backgroundColor:
+                                                        "#14532d !important",
                                                     color: "white",
                                                 },
-                                            },
-                                        }}
-                                    />
-                                </div>
+                                            }}
+                                        />
+                                    </div>
+                                </Paper>
                             );
                         })}
                 </div>

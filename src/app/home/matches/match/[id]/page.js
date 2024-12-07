@@ -40,7 +40,7 @@ export default function MatchPage() {
         );
     }
 
-    // Show error or if no data
+    // Show error message if any
     if (error || !matchData) {
         return (
             <div className="text-center text-red-500 mt-10">
@@ -51,7 +51,7 @@ export default function MatchPage() {
 
     // Safely destructure stats data
     const ad_stats = matchData?.stats_data || {};
-    const { host = {}, games = [], players = [], matchStats = [] } = ad_stats;
+    const { host = {}, players = [], matchStats = [] } = ad_stats;
 
     const getLegsColor = (legs) => {
         if (legs > 3) return "text-green-400";
@@ -129,13 +129,13 @@ export default function MatchPage() {
 
             {players.length > 0 && matchStats.length === players.length ? (
                 <>
-                    {/* Layout: player1score - stats | stats - player2score */}
-                    <div className="w-full bg-zinc-800 rounded-xl py-12">
-                        <div className="max-w-7xl mx-auto px-4 flex items-start justify-evenly space-x-10">
+                    {/* Center the container horizontally by adding mx-auto */}
+                    <div className="w-11/12 mx-auto bg-zinc-800 rounded-xl py-12">
+                        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-start justify-evenly md:space-x-10 space-y-10 md:space-y-0">
                             {players.length === 2 ? (
                                 <>
                                     {/* Player 1 side */}
-                                    <div className="flex-1 flex justify-between items-start">
+                                    <div className="flex flex-col md:flex-row items-center md:items-start justify-between space-y-6 md:space-y-0 md:space-x-6 flex-1">
                                         <ScoreBlock
                                             player={players[0]}
                                             stats={matchStats[0]}
@@ -144,10 +144,10 @@ export default function MatchPage() {
                                     </div>
 
                                     {/* Divider */}
-                                    <div className="w-16 bg-gray-600 h-full mx-6" />
+                                    <div className="hidden md:block w-px bg-gray-600 h-full mx-6" />
 
                                     {/* Player 2 side */}
-                                    <div className="flex-1 flex justify-between items-start">
+                                    <div className="flex flex-col md:flex-row items-center md:items-start justify-between space-y-6 md:space-y-0 md:space-x-6 flex-1">
                                         <StatsBlock stats={matchStats[1]} />
                                         <ScoreBlock
                                             player={players[1]}
@@ -170,32 +170,16 @@ export default function MatchPage() {
                 </p>
             )}
 
-            {/* Game Summary */}
-            <div className="bg-zinc-800 p-6 rounded-lg shadow-md mt-12">
-                <h2 className="text-xl font-semibold mb-4">Game Summary</h2>
-                {games.length > 0 ? (
-                    games.map((game, index) => (
-                        <div
-                            key={game.id || index}
-                            className="mb-6 border-b border-gray-700 pb-4 last:border-none last:pb-0"
-                        >
-                            <h3 className="text-lg font-semibold mb-2">
-                                Game {index + 1} - Variant:{" "}
-                                {game.variant || "N/A"}
-                            </h3>
-                            <p className="text-gray-400">
-                                Winner: {game.winnerPlayerId || "N/A"}
-                            </p>
-                            <p>
-                                Final Score: {game.scores?.join(" - ") || "N/A"}
-                            </p>
-                        </div>
-                    ))
-                ) : (
-                    <p className="text-gray-400 text-center">
-                        No game data available.
-                    </p>
-                )}
+            {/* Link to AutoDarts match stats */}
+            <div className="text-center">
+                <a
+                    href={`https://play.autodarts.io/history/matches/${ad_stats.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block bg-blue-500 hover:bg-blue-400 text-white font-semibold py-2 px-4 rounded"
+                >
+                    View full match stats on autodarts
+                </a>
             </div>
         </div>
     );
