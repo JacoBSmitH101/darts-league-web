@@ -5,9 +5,9 @@ export default function HomePage() {
                 Welcome to the Home Page!
             </h2>
             <p>
-                This is your main dashboard. Select options from the sidebar to
-                get started (only users and standings work) stats will come
-                next.
+                This page will eventually show your stats, recent matches and
+                more... For now you can see your matches and the standings for
+                all divisions via the bar on the left.
             </p>
         </div>
     );

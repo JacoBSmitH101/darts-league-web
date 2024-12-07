@@ -87,7 +87,7 @@ export default function MatchesPage() {
                                         `/home/matches/match/${match.match_id}`
                                     )
                                 }
-                                style={{ height: "150px" }} // Consistent card height
+                                style={{ height: "200px" }} // Increased card height
                             >
                                 {/* Status Bar */}
                                 <div
@@ -95,9 +95,9 @@ export default function MatchesPage() {
                                 ></div>
 
                                 {/* Main Content */}
-                                <div className="p-4 flex flex-col h-full mt-1">
+                                <div className="p-5 flex flex-col h-full mt-1">
                                     <div className="flex flex-col gap-1">
-                                        <h3 className="text-lg font-semibold truncate">
+                                        <h3 className="text-xl font-semibold truncate">
                                             Opponent: {opponent}
                                         </h3>
                                         <p className="text-sm text-gray-400">
@@ -107,14 +107,14 @@ export default function MatchesPage() {
                                             ).toLocaleDateString()}
                                         </p>
                                         {match.state === "complete" && (
-                                            <p className="text-lg font-semibold text-gray-300">
+                                            <p className="text-lg font-semibold text-gray-300 mt-1">
                                                 Score: {score}
                                             </p>
                                         )}
                                     </div>
 
                                     {/* Bottom Info */}
-                                    <div className="flex justify-center items-center mt-2">
+                                    <div className="flex justify-center items-center mt-auto">
                                         <p className="text-xs text-gray-400 text-center">
                                             Click to view match details
                                         </p>
