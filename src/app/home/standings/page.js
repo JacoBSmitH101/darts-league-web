@@ -285,7 +285,7 @@ export default function StandingsPage() {
                                 variant="h6"
                                 component="h2"
                             >
-                                {selectedPlayer.name}'s Details
+                                {selectedPlayer.name}&aposs Details
                             </Typography>
                             <Typography
                                 id="player-details-description"
