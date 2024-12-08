@@ -125,7 +125,7 @@ export default function CustomLayout({ children }) {
             </header>
 
             {/* Content Area */}
-            <div className="flex-1 p-8 flex flex-col items-center justify-start">
+            <div className="flex-1 pt-8 w-full flex flex-col items-center justify-start">
                 <Box
                     sx={{
                         py: 4,
@@ -136,7 +136,7 @@ export default function CustomLayout({ children }) {
                         color: "white",
                         width: "100%",
                         maxWidth: "1200px",
-                        margin: "0 auto",
+                        margin: "0",
                     }}
                 >
                     {children || (
