@@ -27,55 +27,105 @@ export default function StatsPage() {
 
     // Define columns for the DataGrid
     const columns = [
-        { field: "discord_tag", headerName: "Discord Tag", flex: 1 },
-        { field: "autodarts_name", headerName: "AutoDarts Name", flex: 1 },
-        { field: "challonge_id", headerName: "Challonge ID", flex: 1 },
-        { field: "avg", headerName: "Average Score", flex: 1 },
-        { field: "created_at", headerName: "Created At", flex: 1 },
-        { field: "updated_at", headerName: "Updated At", flex: 1 },
+        { 
+            field: "discord_tag", 
+            headerName: "Discord Tag", 
+            flex: 1,
+            headerClassName: 'super-app-theme--header',
+        },
+        { 
+            field: "autodarts_name", 
+            headerName: "AutoDarts Name", 
+            flex: 1,
+            headerClassName: 'super-app-theme--header',
+        },
+        { 
+            field: "challonge_id", 
+            headerName: "Challonge ID", 
+            flex: 1,
+            headerClassName: 'super-app-theme--header',
+        },
+        { 
+            field: "avg", 
+            headerName: "Average Score", 
+            flex: 1,
+            headerClassName: 'super-app-theme--header',
+        },
+        { 
+            field: "created_at", 
+            headerName: "Created At", 
+            flex: 1,
+            headerClassName: 'super-app-theme--header',
+        },
+        { 
+            field: "updated_at", 
+            headerName: "Updated At", 
+            flex: 1,
+            headerClassName: 'super-app-theme--header',
+        },
     ];
 
     return (
-        <div className="text-white text-center px-4 min-w-full h-screen">
-            <h2 className="text-2xl font-semibold">Users</h2>
-            <p>All users in the database</p>
+        <div className="flex flex-col gap-4 p-4">
+            <div className="flex flex-col gap-2">
+                <h2 className="text-2xl font-bold text-white">Users</h2>
+                <p className="text-gray-400">All users in the database</p>
+            </div>
 
             {error && (
-                <p className="text-red-500 mt-4">
+                <div className="bg-red-500/10 border border-red-500 text-red-500 px-4 py-2 rounded">
                     Failed to load stats: {error}
-                </p>
+                </div>
             )}
 
-            <div className="mt-8" style={{ height: 750, width: "100%" }}>
+            <div style={{ height: 750, width: "100%" }}>
                 <DataGrid
                     rows={stats.map((row, index) => ({
-                        id: index, // Add a unique `id` for each row (required by DataGrid)
+                        id: index,
                         ...row,
                     }))}
                     columns={columns}
-                    pageSize={5}
-                    rowsPerPageOptions={[5, 10, 20]}
+                    initialState={{
+                        pagination: { paginationModel: { pageSize: 10 } },
+                    }}
+                    pageSizeOptions={[10, 25, 50]}
                     getRowClassName={(params) =>
                         params.row.user_id === loggedInDiscordId
                             ? "highlighted-row"
                             : ""
                     }
                     sx={{
-                        backgroundColor: "rgba(0, 0, 0, 0.8)",
-                        color: "white",
-                        border: "none",
-                        "& .MuiDataGrid-columnHeaders": {
-                            backgroundColor: "#1f2937",
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        '& .MuiDataGrid-cell': {
+                            borderColor: 'rgb(51, 65, 85)',
+                            color: 'white',
                         },
-                        "& .MuiDataGrid-cell": {
-                            borderBottom: "1px solid #374151",
+                        '& .MuiDataGrid-columnHeaders': {
+                            borderColor: 'rgb(51, 65, 85)',
+                            backgroundColor: 'rgb(15, 23, 42)',
                         },
-                        "& .MuiDataGrid-footerContainer": {
-                            backgroundColor: "#1f2937",
+                        '& .MuiDataGrid-row': {
+                            backgroundColor: 'rgb(15, 23, 42)',
+                            '&:hover': {
+                                backgroundColor: 'rgb(30, 41, 59)',
+                            },
                         },
-                        "& .MuiDataGrid-row.highlighted-row": {
-                            backgroundColor: "#4B5563", // Dark gray for highlighting
-                            color: "white",
+                        '& .highlighted-row': {
+                            backgroundColor: 'rgb(51, 65, 85)',
+                            '&:hover': {
+                                backgroundColor: 'rgb(71, 85, 105)',
+                            },
+                        },
+                        '& .MuiDataGrid-footerContainer': {
+                            borderColor: 'rgb(51, 65, 85)',
+                            backgroundColor: 'rgb(15, 23, 42)',
+                        },
+                        '& .MuiTablePagination-root': {
+                            color: 'white',
+                        },
+                        '& .MuiButtonBase-root': {
+                            color: 'white',
                         },
                     }}
                 />
