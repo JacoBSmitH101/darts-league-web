@@ -27,6 +27,8 @@ export default function MatchPage() {
                 const data = await res.json();
                 console.log(data);
                 setMatchData(data);
+
+                
             } catch (err) {
                 setError("Failed to fetch match data");
             } finally {
@@ -119,7 +121,7 @@ export default function MatchPage() {
                 <Typography variant="h4" className={`font-extrabold ${legsColor}`}>
                     {legs}
                 </Typography>
-                {matchData.state === "complete" ? (
+                {matchData.state == "complete" ? (
                     <Typography
                         variant="h6"
                         component="span"
