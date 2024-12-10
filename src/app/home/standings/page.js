@@ -99,12 +99,15 @@ export default function StandingsPage() {
                     {Object.keys(standings)
                         .slice(0, 4)
                         .map((groupId, index) => {
+                            // Extract and sort group standings by points descending
                             const groupStandings = Object.values(
                                 standings[groupId].standings
-                            ).map((player, idx) => ({
-                                id: `${groupId}-${idx}`,
-                                ...player,
-                            }));
+                            )
+                                .map((player, idx) => ({
+                                    id: `${groupId}-${idx}`,
+                                    ...player,
+                                }))
+                                .sort((a, b) => b.points - a.points); // Sorting here
 
                             return (
                                 <Box key={groupId} sx={{ width: "100%" }}>
@@ -233,15 +236,15 @@ export default function StandingsPage() {
                                                                     "wins"
                                                                         ? row.wins
                                                                         : column.id ===
-                                                                            "losses"
-                                                                          ? row.losses
-                                                                          : column.id ===
-                                                                              "draws"
-                                                                            ? row.draws
-                                                                            : row[
-                                                                                  column
-                                                                                      .id
-                                                                              ]}
+                                                                          "losses"
+                                                                        ? row.losses
+                                                                        : column.id ===
+                                                                          "draws"
+                                                                        ? row.draws
+                                                                        : row[
+                                                                              column
+                                                                                  .id
+                                                                          ]}
                                                                 </TableCell>
                                                             )
                                                         )}
@@ -285,7 +288,7 @@ export default function StandingsPage() {
                                 variant="h6"
                                 component="h2"
                             >
-                                {selectedPlayer.name}&aposs Details
+                                {selectedPlayer.name}&apos;s Details
                             </Typography>
                             <Typography
                                 id="player-details-description"

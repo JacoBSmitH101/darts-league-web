@@ -28,7 +28,7 @@ export default function MatchPage() {
                 console.log(data);
                 setMatchData(data);
 
-                
+
             } catch (err) {
                 setError("Failed to fetch match data");
             } finally {
@@ -63,7 +63,7 @@ export default function MatchPage() {
 
     const getLegsColor = (legs) => {
         if (legs > 3) return "text-green-400";
-        if (legs === 3) return "text-orange-700 font-bold"; // More prominent
+        if (legs === 3) return "text-orange-400 font-bold"; // More prominent
         return "text-red-400";
     };
 
@@ -83,6 +83,7 @@ export default function MatchPage() {
                 ? `${stats.player1_score} - ${stats.player2_score}`
                 : `${stats.player2_score} - ${stats.player1_score}`;
         const scoreColor = getScoreColor(score);
+
 
         return (
             <Card
@@ -121,30 +122,17 @@ export default function MatchPage() {
                 <Typography variant="h4" className={`font-extrabold ${legsColor}`}>
                     {legs}
                 </Typography>
-                {matchData.state == "complete" ? (
+                {!matchData.is_valid ? (
                     <Typography
-                        variant="h6"
-                        component="span"
-                        className={`font-semibold ${scoreColor} flex items-center`}
-                        sx={{ textShadow: "1px 1px 2px rgba(0,0,0,0.5)" }}
-                    >
-                        {score}
-                        {player.winner_id === null ? (
-                            <RemoveCircle className="ml-1 text-yellow-600" />
-                        ) : player.winner_id === player.player1_id ? (
-                            <CheckCircle className="ml-1 text-green-600" />
-                        ) : (
-                            <Cancel className="ml-1 text-red-600" />
-                        )}
-                    </Typography>
+                    variant="h6"
+                    component="span"
+                    className="font-semibold text-gray-400"
+                >
+                    Not Played
+                </Typography>
+
                 ) : (
-                    <Typography
-                        variant="h6"
-                        component="span"
-                        className="font-semibold text-gray-400"
-                    >
-                        Not Played
-                    </Typography>
+                    <h1></h1>
                 )}
             </Card>
         );
