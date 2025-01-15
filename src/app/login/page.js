@@ -19,7 +19,7 @@ export default function Login() {
             {/* Black Box Container */}
             <div className="bg-gray-800 p-8 rounded-lg shadow-lg max-w-md w-full text-center">
                 <h1 className="text-3xl font-bold text-white mb-4">
-                    Login to your discord account to view stats
+                    Login to your discord account to view the league
                 </h1>
                 <p className="text-gray-400 mb-6">
                     Access league stats, manage players, and track scores

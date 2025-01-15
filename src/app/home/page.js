@@ -10,14 +10,14 @@ export default function HomePage() {
                 all divisions via the bar at the top
             </p>
 
-            <iframe
+            {/* <iframe
                 src="https://challonge.com/d9k30b1r/module"
                 width="100%"
                 height="500"
                 frameborder="0"
                 scrolling="auto"
                 allowtransparency="true"
-            ></iframe>
+            ></iframe> */}
         </div>
     );
 }
