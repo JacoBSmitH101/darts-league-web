@@ -38,7 +38,8 @@ export default function MatchesPage() {
     }, [userId]);
 
     const getStatusColor = (match) => {
-        const isPlayer1 = match.player1_id === session?.user?.id;
+        console.log(match);
+        const isPlayer1 = match.player1_name === session?.user?.name;
 
         if (match.state === "complete") {
             if (match.winner_id === null)
