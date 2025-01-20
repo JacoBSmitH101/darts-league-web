@@ -38,18 +38,23 @@ export default function MatchesPage() {
     }, [userId]);
 
     const getStatusColor = (match) => {
+        console.log(match);
+        const isPlayer1 = match.player1_name === session?.user?.name;
+
         if (match.state === "complete") {
             if (match.winner_id === null)
                 return { bg: "rgba(234, 179, 8, 0.1)", border: "#EAB308" }; // Draw - yellow
-            if (match.winner_id === match.player1_id)
+            if (
+                match.winner_id ===
+                (isPlayer1 ? match.player1_id : match.player2_id)
+            )
                 return { bg: "rgba(34, 197, 94, 0.1)", border: "#22C55E" }; // Won - green
             return { bg: "rgba(239, 68, 68, 0.1)", border: "#EF4444" }; // Lost - red
         }
         return { bg: "rgba(107, 114, 128, 0.1)", border: "#6B7280" }; // Not Played - gray
     };
-
     const getScoreColor = (score) => {
-        const playerScore = parseInt(score.split('-')[0].trim());
+        const playerScore = parseInt(score.split("-")[0].trim());
         if (playerScore <= 2) return "text-red-500 font-bold"; // More prominent
         if (playerScore === 3) return "text-orange-400 font-bold"; // Increased prominence
         if (playerScore >= 4) return "text-green-500 font-bold"; // More prominent
@@ -63,7 +68,11 @@ export default function MatchesPage() {
         >
             {/* Header Section */}
             <div className="text-center mb-8">
-                <Typography variant="h3" component="h2" sx={{ fontWeight: "bold", mb: 1, color: "white" }}>
+                <Typography
+                    variant="h3"
+                    component="h2"
+                    sx={{ fontWeight: "bold", mb: 1, color: "white" }}
+                >
                     Your Matches
                 </Typography>
                 <Typography variant="subtitle1" sx={{ color: "white" }}>
@@ -104,7 +113,9 @@ export default function MatchesPage() {
                             <Card
                                 key={match.match_id}
                                 onClick={() =>
-                                    router.push(`/home/matches/match/${match.match_id}`)
+                                    router.push(
+                                        `/home/matches/match/${match.match_id}`
+                                    )
                                 }
                                 className="cursor-pointer hover:shadow-xl transition-shadow duration-200 ease-in-out"
                                 sx={{
@@ -114,7 +125,8 @@ export default function MatchesPage() {
                                     height: "112px", // Adjusted height for shorter boxes
                                     boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
                                     "&:hover": {
-                                        boxShadow: "0 10px 15px rgba(0,0,0,0.2)",
+                                        boxShadow:
+                                            "0 10px 15px rgba(0,0,0,0.2)",
                                     },
                                     display: "flex",
                                     flexDirection: "column",
@@ -125,7 +137,9 @@ export default function MatchesPage() {
                                 tabIndex={0}
                                 onKeyPress={(e) => {
                                     if (e.key === "Enter" || e.key === " ") {
-                                        router.push(`/home/matches/match/${match.match_id}`);
+                                        router.push(
+                                            `/home/matches/match/${match.match_id}`
+                                        );
                                     }
                                 }}
                                 aria-label={`Match against ${opponent}`}
@@ -136,7 +150,10 @@ export default function MatchesPage() {
                                             variant="h6"
                                             component="h3"
                                             className="truncate max-w-[70%]"
-                                            sx={{ color: "white", fontWeight: "medium" }}
+                                            sx={{
+                                                color: "white",
+                                                fontWeight: "medium",
+                                            }}
                                         >
                                             {opponent}
                                         </Typography>
@@ -169,7 +186,9 @@ export default function MatchesPage() {
 
                                     <div className="flex flex-col text-sm text-gray-400">
                                         <span>
-                                            {new Date(match.updated_at).toLocaleDateString()}
+                                            {new Date(
+                                                match.updated_at
+                                            ).toLocaleDateString()}
                                         </span>
                                         <span className="text-xs">
                                             Click for details

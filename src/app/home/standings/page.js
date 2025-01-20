@@ -29,6 +29,7 @@ export default function StandingsPage() {
             .then((response) => response.json())
             .then((data) => {
                 setStandings(data.groups || {});
+                console.log(data.groups);
                 setLoading(false);
             })
             .catch((err) => {
@@ -99,12 +100,15 @@ export default function StandingsPage() {
                     {Object.keys(standings)
                         .slice(0, 4)
                         .map((groupId, index) => {
+                            // Extract and sort group standings by points descending
                             const groupStandings = Object.values(
                                 standings[groupId].standings
-                            ).map((player, idx) => ({
-                                id: `${groupId}-${idx}`,
-                                ...player,
-                            }));
+                            )
+                                .map((player, idx) => ({
+                                    id: `${groupId}-${idx}`,
+                                    ...player,
+                                }))
+                                .sort((a, b) => b.points - a.points); // Sorting here
 
                             return (
                                 <Box key={groupId} sx={{ width: "100%" }}>
@@ -285,7 +289,7 @@ export default function StandingsPage() {
                                 variant="h6"
                                 component="h2"
                             >
-                                {selectedPlayer.name}&aposs Details
+                                {selectedPlayer.name}&apos;s Details
                             </Typography>
                             <Typography
                                 id="player-details-description"

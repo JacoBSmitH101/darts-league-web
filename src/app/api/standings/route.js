@@ -3,13 +3,22 @@ import { NextResponse } from "next/server";
 
 export async function GET(req) {
     const { searchParams } = new URL(req.url);
-    const tournamentId = searchParams.get("tournament_id");
+    let tournamentId = searchParams.get("tournament_id");
 
     if (!tournamentId) {
-        return NextResponse.json(
-            { error: "tournament_id is required" },
-            { status: 400 }
+        const { rows: tournamentRows } = await query(
+            "SELECT tournament_id FROM tournaments WHERE active = 1"
         );
+        tournamentId = tournamentRows.length
+            ? tournamentRows[0].tournament_id
+            : null;
+
+        if (!tournamentId) {
+            return NextResponse.json(
+                { error: "No active tournament found" },
+                { status: 404 }
+            );
+        }
     }
 
     // Define mobileView if needed, or just remove these checks.
