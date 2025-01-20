@@ -29,6 +29,7 @@ export default function StandingsPage() {
             .then((response) => response.json())
             .then((data) => {
                 setStandings(data.groups || {});
+                console.log(data.groups);
                 setLoading(false);
             })
             .catch((err) => {
@@ -236,15 +237,15 @@ export default function StandingsPage() {
                                                                     "wins"
                                                                         ? row.wins
                                                                         : column.id ===
-                                                                          "losses"
-                                                                        ? row.losses
-                                                                        : column.id ===
-                                                                          "draws"
-                                                                        ? row.draws
-                                                                        : row[
-                                                                              column
-                                                                                  .id
-                                                                          ]}
+                                                                            "losses"
+                                                                          ? row.losses
+                                                                          : column.id ===
+                                                                              "draws"
+                                                                            ? row.draws
+                                                                            : row[
+                                                                                  column
+                                                                                      .id
+                                                                              ]}
                                                                 </TableCell>
                                                             )
                                                         )}
