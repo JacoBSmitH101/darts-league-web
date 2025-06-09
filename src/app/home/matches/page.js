@@ -16,7 +16,7 @@ export default function MatchesPage() {
     const getStats = async () => {
         try {
             const res = await fetch(
-                `/api/matches?user_id=${session?.user?.id}&tournament_id=15397196`
+                `/api/matches?user_id=${session?.user?.id}&tournament_id=16310779`
             );
             if (!res.ok) {
                 throw new Error(`Error: ${res.status} ${res.statusText}`);

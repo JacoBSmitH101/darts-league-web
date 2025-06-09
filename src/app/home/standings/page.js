@@ -25,7 +25,7 @@ export default function StandingsPage() {
     const [open, setOpen] = useState(false);
 
     useEffect(() => {
-        fetch("/api/standings?tournament_id=15397196")
+        fetch("/api/standings?tournament_id=16310779")
             .then((response) => response.json())
             .then((data) => {
                 setStandings(data.groups || {});
